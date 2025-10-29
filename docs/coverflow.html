@@ -5,27 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title></title>
 <style>
-  /* Vollfläche + keine Scrollbars */
-  html,body{margin:0;height:100svh;background:#071c46}
+  /* Vollfläche + Scrollbars aus */
+  html,body{margin:0;height:100vh;background:#071c46}
   html,body{overflow:hidden; -ms-overflow-style:none; scrollbar-width:none}
   body::-webkit-scrollbar{display:none}
+  *{box-sizing:border-box}
 
   /* Bühne */
-  .wrap{display:grid;place-items:center;min-height:100svh;padding:0}
+  .wrap{display:grid;place-items:center;height:100vh;padding:0}
 
-  /* Netflix-Style Coverflow */
-  .unipop-coverflow{
-    --gap:24%; --angle:16deg; --scale-step:.11;
-    --card-ratio:2/3; --card-width:clamp(200px,40vw,360px);
-    position:relative; perspective:1000px;
-    height:calc(var(--card-width) / (var(--card-ratio)));
-    display:grid; place-items:center; overflow:visible; isolation:isolate;
+  /* Responsive Postergröße:
+     - 40vw (breit)
+     - ODER 72vh in Höhe -> Breite = Höhe * 2/3
+     - min/max Klammern verhindern zu klein/groß
+  */
+  :root{
+    --card-ratio: 2/3;                             /* width / height   */
+    --card-w: clamp(200px, min(40vw, calc(72vh * (2/3))), 420px);
+    --gap: 24%;
+    --angle: 16deg;
+    --scale-step: .11;
   }
+
+  .unipop-coverflow{
+    position:relative; perspective:1000px;
+    /* Höhe aus Breite & Ratio ableiten */
+    width:100%;
+    height: calc(var(--card-w) / (var(--card-ratio)));
+    display:grid; place-items:center; overflow:visible; isolation:isolate;
+    /* Platz für Dots, damit nix übersteht -> keine Scrollbar */
+    padding-block-end: 28px;
+  }
+
   .unipop-stage{position:relative;width:100%;height:100%}
+
   .unipop-item{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
-    width:var(--card-width); aspect-ratio:var(--card-ratio);
+    width:var(--card-w); aspect-ratio:var(--card-ratio);
     border-radius:16px; overflow:hidden; background:#111;
     box-shadow:0 18px 40px rgba(0,0,0,.35);
     will-change:transform,filter;
@@ -44,12 +61,16 @@
     pointer-events:auto; width:46px; height:46px; border-radius:999px; border:none; cursor:pointer;
     background:rgba(0,0,0,.55); color:#fff; font-size:22px; display:grid; place-items:center
   }
-  .unipop-dots{position:absolute; bottom:-28px; left:50%; transform:translateX(-50%); display:flex; gap:.45rem}
+
+  .unipop-dots{
+    position:absolute; bottom:6px; left:50%;
+    transform:translateX(-50%); display:flex; gap:.45rem
+  }
   .unipop-dot{width:9px; height:9px; border-radius:50%; border:none; cursor:pointer; background:rgba(255,255,255,.5)}
   .unipop-dot[aria-current="true"]{background:#fff}
 
-  @media(max-width:520px){
-    .unipop-coverflow{ --gap:28%; --angle:14deg; --scale-step:.13; --card-width:clamp(180px,70vw,320px); }
+  @media (max-width:520px){
+    :root{ --gap:28%; --angle:14deg; --scale-step:.13; }
   }
 </style>
 </head>
