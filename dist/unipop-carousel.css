@@ -1,0 +1,17 @@
+.unipop-carousel{position:relative;overflow:hidden;isolation:isolate}
+.unipop-track{display:flex;transition:transform .45s ease;will-change:transform}
+.unipop-slide{min-width:100%;flex:0 0 100%;position:relative}
+.unipop-slide figure{margin:0;position:relative}
+.unipop-slide img{display:block;width:100%;height:auto;object-fit:cover}
+.unipop-caption{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);color:#fff;font:600 14px/1.4 system-ui,Segoe UI,Helvetica,Arial,sans-serif;padding:.6rem .8rem}
+.unipop-nav{position:absolute;top:50%;inset-inline:0;display:flex;justify-content:space-between;transform:translateY(-50%);pointer-events:none}
+.unipop-btn{pointer-events:auto;background:rgba(0,0,0,.45);border:none;color:#fff;font-size:24px;line-height:1;border-radius:999px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer}
+.unipop-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.unipop-dots{position:absolute;left:50%;transform:translateX(-50%);bottom:.6rem;display:flex;gap:.35rem}
+.unipop-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.5);border:none;cursor:pointer}
+.unipop-dot[aria-current="true"]{background:#fff}
+.unipop-carousel[data-aspect="16/9"] .unipop-slide{aspect-ratio:16/9}
+.unipop-carousel[data-aspect="4/3"] .unipop-slide{aspect-ratio:4/3}
+.unipop-carousel[data-aspect="1/1"] .unipop-slide{aspect-ratio:1/1}
+@media (hover:hover){.unipop-btn:hover{background:rgba(0,0,0,.65)}}
+@media print {.unipop-nav,.unipop-dots{display:none}}
