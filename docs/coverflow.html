@@ -1,1 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniPop Coverflow</title>
+<style>
+html,body{margin:0;background:#071c46}
+.wrap{display:grid;place-items:center;min-height:100svh;padding:32px}
+.unipop-coverflow{--gap:26%;--angle:18deg;--scale-step:.12;--card-ratio:2/3;--card-width:clamp(180px,38vw,340px);
+position:relative;perspective:1000px;height:calc(var(--card-width)/(var(--card-ratio)));
+display:grid;place-items:center;overflow:visible;isolation:isolate}
+.unipop-stage{position:relative;width:100%;height:100%}
+.unipop-item{position:absolute;inset:50% auto auto 50%;translate:-50% -50%;
+width:var(--card-width);aspect-ratio:var(--card-ratio);border-radius:16px;overflow:hidden;
+box-shadow:0 18px 40px rgba(0,0,0,.35);will-change:transform;
+transition:transform .45s ease, z-index .45s ease, box-shadow .45s ease, filter .45s ease;background:#111}
+.unipop-item img{width:100%;height:100%;object-fit:cover;display:block}
+.unipop-item[aria-current="true"]{box-shadow:0 24px 60px rgba(0,0,0,.45);filter:none}
+.unipop-item[aria-current="false"]{filter:brightness(.85) saturate(.95)}
+.unipop-nav{position:absolute;inset-inline:0;top:50%;display:flex;justify-content:space-between;transform:translateY(-50%);pointer-events:none}
+.unipop-btn{pointer-events:auto;width:46px;height:46px;border-radius:999px;border:none;cursor:pointer;background:rgba(0,0,0,.55);color:#fff;font-size:22px;display:grid;place-items:center}
+.unipop-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(hover:hover){.unipop-btn:hover{background:rgba(0,0,0,.75)}}
+.unipop-dots{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);display:flex;gap:.45rem}
+.unipop-dot{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.5)}
+.unipop-dot[aria-current="true"]{background:#fff}
+@media(max-width:520px){.unipop-coverflow{--gap:30%;--angle:18deg;--scale-step:.14}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="unipop-coverflow" data-autoplay="4000" data-loop="true" data-ratio="2/3">
+  <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin1.jpg"></div>
+  <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin3.jpg"></div>
+  <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin5.jpg"></div>
+  <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin4.jpg"></div>
+  <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin2.jpg"></div>
+</div>
+</div>
+
+<script>
+(()=>{const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
+function clamp(n,min,max){return Math.max(min,Math.min(n,max));}
+function init(root){
+  if(root.__inited) return; root.__inited=true;
+  const autoplay=parseInt(root.dataset.autoplay||'0',10);
+  const loop=root.dataset.loop==='true';
+  const ratio=root.dataset.ratio||''; if(ratio) root.style.setProperty('--card-ratio',ratio);
+  const items=$$('.unipop-item',root); if(!items.length) return;
+  const stage=document.createElement('div'); stage.className='unipop-stage';
+  while(root.firstChild) stage.appendChild(root.firstChild); root.appendChild(stage);
+  const nav=document.createElement('div'); nav.className='unipop-nav';
+  const prevBtn=Object.assign(document.createElement('button'),{className:'unipop-btn',innerHTML:'‹'});
+  const nextBtn=Object.assign(document.createElement('button'),{className:'unipop-btn',innerHTML:'›'});
+  nav.append(prevBtn,nextBtn); root.appendChild(nav);
+  const dots=document.createElement('div'); dots.className='unipop-dots';
+  items.forEach((_,i)=>{const d=document.createElement('button'); d.className='unipop-dot'; dots.appendChild(d);});
+  root.appendChild(dots);
+  let index=0,timer=null;
+  function render(){
+    const cs=getComputedStyle(root);
+    const gap=parseFloat(cs.getPropertyValue('--gap'))||28;
+    const angle=parseFloat(cs.getPropertyValue('--angle'))||20;
+    const step=parseFloat(cs.getPropertyValue('--scale-step'))||.12;
+    items.forEach((el,i)=>{
+      const off=i-index, dir=Math.sign(off), abs=Math.abs(off);
+      const x=off*gap; const sc=1-(abs*step); const rot=dir*angle;
+      el.style.zIndex=String(100-abs);
+      el.style.transform=`translate3d(calc(${x}% - 50% + 50%), -50%, 0) rotateY(${rot}deg) scale(${sc})`;
+      el.setAttribute('aria-current', abs===0 ? 'true':'false');
+    });
+    $$('.unipop-dot',root).forEach((d,i)=> d.setAttribute('aria-current',String(i===index)));
+  }
+  function go(i){ index = loop ? (i+items.length)%items.length : clamp(i,0,items.length-1); render(); }
+  function next(){ go(index+1); } function prev(){ go(index-1); }
+  prevBtn.addEventListener('click',()=>{prev();});
+  nextBtn.addEventListener('click',()=>{next();});
+  $$('.unipop-dot',root).forEach((d,i)=> d.addEventListener('click',()=>{go(i);} ));
+  go(0); window.addEventListener('resize',render);
+  if(autoplay>0) setInterval(next,autoplay);
+}
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.unipop-coverflow').forEach(init);});
+})();
+</script>
+</body>
+</html>
 
