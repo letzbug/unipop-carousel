@@ -5,20 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title></title>
 <style>
-  body{margin:0;background:#071c46;color:#fff;font:600 18px/1.3 system-ui,Segoe UI,Helvetica,Arial}
+  /* Vollfläche + keine Scrollbars */
+  html,body{margin:0;height:100svh;background:#071c46}
+  html,body{overflow:hidden; -ms-overflow-style:none; scrollbar-width:none}
+  body::-webkit-scrollbar{display:none}
+
+  /* Bühne */
   .wrap{display:grid;place-items:center;min-height:100svh;padding:0}
 
+  /* Netflix-Style Coverflow */
   .unipop-coverflow{
-    --gap:24%;
-    --angle:16deg;
-    --scale-step:.11;
-    --card-ratio:2/3;
-    --card-width:clamp(200px,40vw,360px);
+    --gap:24%; --angle:16deg; --scale-step:.11;
+    --card-ratio:2/3; --card-width:clamp(200px,40vw,360px);
     position:relative; perspective:1000px;
     height:calc(var(--card-width) / (var(--card-ratio)));
     display:grid; place-items:center; overflow:visible; isolation:isolate;
   }
-
   .unipop-stage{position:relative;width:100%;height:100%}
   .unipop-item{
     position:absolute; left:50%; top:50%;
@@ -26,7 +28,7 @@
     width:var(--card-width); aspect-ratio:var(--card-ratio);
     border-radius:16px; overflow:hidden; background:#111;
     box-shadow:0 18px 40px rgba(0,0,0,.35);
-    will-change:transform, filter;
+    will-change:transform,filter;
     transition:transform .35s cubic-bezier(.22,.61,.36,1), z-index .35s ease, box-shadow .35s ease, filter .35s ease;
   }
   .unipop-item img{width:100%;height:100%;object-fit:cover;display:block}
@@ -54,7 +56,7 @@
 <body>
 
 <div class="wrap">
-  <div class="unipop-coverflow" data-autoplay="1200" data-loop="true" data-ratio="2/3">
+  <div class="unipop-coverflow" data-autoplay="1200" data-loop="true" data-ratio="2/3" aria-label="UniPop Galerie">
     <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin1.jpg" alt=""></div>
     <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin3.jpg" alt=""></div>
     <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin5.jpg" alt=""></div>
@@ -64,12 +66,10 @@
 </div>
 
 <script>
-(() => {
-const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
-const clamp=(n,min,max)=>Math.max(min,Math.min(n,max));
+(()=>{const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));const clamp=(n,min,max)=>Math.max(min,Math.min(n,max));
 function init(root){
   if(root.__inited) return; root.__inited=true;
-  const NORMAL=2200, HOVER=700;
+  const NORMAL=1200, HOVER=700;
   const loop=root.dataset.loop==="true";
   const ratio=root.dataset.ratio||""; if(ratio) root.style.setProperty("--card-ratio",ratio);
   const items=$$(".unipop-item",root); if(!items.length) return;
@@ -83,7 +83,7 @@ function init(root){
   nav.append(prevBtn,nextBtn); root.appendChild(nav);
 
   const dots=document.createElement("div"); dots.className="unipop-dots";
-  items.forEach((_,i)=>{const d=document.createElement("button");d.className="unipop-dot";dots.appendChild(d);});
+  items.forEach((_,i)=>{const d=document.createElement("button"); d.className="unipop-dot"; dots.appendChild(d);});
   root.appendChild(dots);
 
   let index=0, timer=null, hoverTimer=null;
@@ -93,7 +93,6 @@ function init(root){
     const gap=parseFloat(cs.getPropertyValue('--gap'))||24;
     const ang=parseFloat(cs.getPropertyValue('--angle'))||16;
     const step=parseFloat(cs.getPropertyValue('--scale-step'))||.11;
-
     items.forEach((el,i)=>{
       const off=i-index, dir=Math.sign(off), abs=Math.abs(off);
       const x=off*gap, sc=1-(abs*step), rot=dir*ang;
@@ -101,33 +100,31 @@ function init(root){
       el.style.transform=`translate(-50%,-50%) translateX(${x}%) rotateY(${rot}deg) scale(${sc})`;
       el.setAttribute('aria-current', abs===0 ? 'true' : 'false');
     });
-    $$(".unipop-dot",root).forEach((d,i)=>d.setAttribute("aria-current",String(i===index)));
+    $$(".unipop-dot",root).forEach((d,i)=> d.setAttribute("aria-current", String(i===index)));
   }
-
   function go(i){ index = loop ? (i+items.length)%items.length : clamp(i,0,items.length-1); render(); }
-  const next=()=>go(index+1);
-  const prev=()=>go(index-1);
+  const next=()=>go(index+1), prev=()=>go(index-1);
 
   function start(){ stop(); timer=setInterval(next,NORMAL); }
   function stop(){ if(timer){clearInterval(timer);timer=null;} }
   function startHover(){ stopHover(); hoverTimer=setInterval(next,HOVER); }
   function stopHover(){ if(hoverTimer){clearInterval(hoverTimer);hoverTimer=null;} }
 
-  nextBtn.onclick=()=>{next();start();}
-  prevBtn.onclick=()=>{prev();start();}
-  $$(".unipop-dot",root).forEach((d,i)=>d.onclick=()=>{go(i);start();});
+  nextBtn.onclick=()=>{next();start();};
+  prevBtn.onclick=()=>{prev();start();};
+  $$(".unipop-dot",root).forEach((d,i)=> d.onclick=()=>{go(i);start();});
 
-  root.onmouseover=()=>{stop();startHover();}
-  root.onmouseout =()=>{stopHover();start();}
+  root.onmouseover=()=>{stop();startHover();};
+  root.onmouseout =()=>{stopHover();start();};
 
-  let sx=0,drag=false;
-  stage.onpointerdown=e=>{drag=true;sx=e.clientX;stop();stopHover();}
-  stage.onpointerup  =e=>{if(!drag)return;const dx=e.clientX-sx;drag=false;if(dx<-40)next();else if(dx>40)prev();start();}
+  let sx=0, drag=false;
+  stage.onpointerdown=e=>{drag=true;sx=e.clientX;stop();stopHover();};
+  stage.onpointerup  =e=>{if(!drag)return;const dx=e.clientX-sx;drag=false;if(dx<-40)next();else if(dx>40)prev();start();};
   stage.onpointercancel=()=>drag=false;
 
-  go(0);start();
+  go(0); start();
 }
-document.addEventListener("DOMContentLoaded",()=>$$(".unipop-coverflow").forEach(init));
+document.addEventListener("DOMContentLoaded",()=> $$(".unipop-coverflow").forEach(init));
 })();
 </script>
 
