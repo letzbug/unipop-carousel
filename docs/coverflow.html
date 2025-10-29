@@ -5,31 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UniPop Coverflow</title>
 <style>
-  /* --- Test-Header, damit du sofort siehst, dass die Seite geladen ist --- */
-  body{margin:0;background:#071c46;color:#fff;font:600 20px/1.2 system-ui,Segoe UI,Helvetica,Arial,sans-serif}
+  /* Hintergrund + Basis */
+  body{margin:0;background:#071c46;color:#fff;font:600 18px/1.3 system-ui,Segoe UI,Helvetica,Arial}
   .hdr{padding:16px 20px} .hdr small{font-weight:400;opacity:.8}
-
   .wrap{display:grid;place-items:center;min-height:calc(100svh - 60px);padding:24px}
-  /* --- Coverflow CSS (robust, kein 'translate:'-Shorthand) --- */
+
+  /* Netflix-Style Coverflow */
   .unipop-coverflow{
-    --gap:26%; --angle:18deg; --scale-step:.12; --card-ratio:2/3; --card-width:clamp(180px,38vw,340px);
+    --gap:24%;           /* Kartenabstand (X) – Netflix feeling */
+    --angle:16deg;       /* seitliche Neigung */
+    --scale-step:.11;    /* Verkleinerung pro Schritt */
+    --card-ratio:2/3;    /* Poster-Format */
+    --card-width:clamp(200px,40vw,360px); /* Größe */
     position:relative; perspective:1000px;
     height:calc(var(--card-width) / (var(--card-ratio)));
     display:grid; place-items:center; overflow:visible; isolation:isolate;
   }
   .unipop-stage{position:relative;width:100%;height:100%}
+
   .unipop-item{
     position:absolute; left:50%; top:50%;
-    transform:translate(-50%,-50%);           /* statt translate: ... */
+    transform:translate(-50%,-50%);
     width:var(--card-width); aspect-ratio:var(--card-ratio);
     border-radius:16px; overflow:hidden; background:#111;
     box-shadow:0 18px 40px rgba(0,0,0,.35);
     will-change:transform, filter;
-    transition:transform .45s ease, z-index .45s ease, box-shadow .45s ease, filter .45s ease;
+    transition:transform .45s cubic-bezier(.22,.61,.36,1), z-index .45s ease, box-shadow .45s ease, filter .45s ease;
   }
   .unipop-item img{width:100%;height:100%;object-fit:cover;display:block}
-  .unipop-item[aria-current="true"]{box-shadow:0 24px 60px rgba(0,0,0,.45);filter:none}
-  .unipop-item[aria-current="false"]{filter:brightness(.85) saturate(.95)}
+
+  .unipop-item[aria-current="true"]{
+    box-shadow:0 28px 64px rgba(0,0,0,.48);
+    filter:none;
+  }
+  .unipop-item[aria-current="false"]{
+    filter:brightness(.88) saturate(.96);
+  }
+
+  /* Navigation */
   .unipop-nav{
     position:absolute; inset-inline:0; top:50%;
     display:flex; justify-content:space-between; transform:translateY(-50%);
@@ -37,102 +50,120 @@
   }
   .unipop-btn{
     pointer-events:auto; width:46px; height:46px; border-radius:999px; border:none; cursor:pointer;
-    background:rgba(0,0,0,.55); color:#fff; font-size:22px; display:grid; place-items:center;
+    background:rgba(0,0,0,.55); color:#fff; font-size:22px; display:grid; place-items:center
   }
   .unipop-btn:focus-visible{outline:2px solid #fff; outline-offset:2px}
   @media(hover:hover){.unipop-btn:hover{background:rgba(0,0,0,.75)}}
+
+  /* Dots */
   .unipop-dots{position:absolute; bottom:-28px; left:50%; transform:translateX(-50%); display:flex; gap:.45rem}
   .unipop-dot{width:9px; height:9px; border-radius:50%; border:none; cursor:pointer; background:rgba(255,255,255,.5)}
   .unipop-dot[aria-current="true"]{background:#fff}
-  @media(max-width:520px){.unipop-coverflow{--gap:30%; --angle:16deg; --scale-step:.14}}
+
+  /* Mobile Feinschliff */
+  @media(max-width:520px){
+    .unipop-coverflow{ --gap:28%; --angle:14deg; --scale-step:.13; --card-width:clamp(180px,70vw,320px); }
+  }
 </style>
 </head>
 <body>
-  <div class="hdr">✅ GitHub Pages läuft <small>– Coverflow sollte darunter erscheinen</small></div>
+  <div class="hdr">✅ GitHub Pages läuft <small>– Netflix Coverflow aktiv</small></div>
 
   <div class="wrap">
-    <div class="unipop-coverflow" data-autoplay="4000" data-loop="true" data-ratio="2/3" aria-label="Coverflow Galerie">
-      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin1.jpg" alt=""></div>
-      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin3.jpg" alt=""></div>
-      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin5.jpg" alt=""></div>
-      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin4.jpg" alt=""></div>
-      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin2.jpg" alt=""></div>
+    <!-- Netflix Tempo: 2200 ms; Loop an -->
+    <div class="unipop-coverflow" data-autoplay="2200" data-loop="true" data-ratio="2/3" aria-label="Coverflow Galerie">
+      <!-- Deine Poster -->
+      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin1.jpg" alt="Workshop – Destillation"></div>
+      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin3.jpg" alt="Gewürzregal und Botanicals"></div>
+      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin5.jpg" alt="Teilnehmer im Labor"></div>
+      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin4.jpg" alt="Aroma-Proben"></div>
+      <div class="unipop-item"><img src="https://www.unipop.lu/wp-content/uploads/2025/10/Gin2.jpg" alt="Verkostung"></div>
     </div>
   </div>
 
   <script>
-  // Super-robuste Version (mit sichtbaren Logs), kein externes JS nötig
   (()=>{const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
-  const log=(...a)=>{ try{console.log('[Coverflow]',...a);}catch(e){} };
-
-  function clamp(n,min,max){return Math.max(min,Math.min(n,max));}
+  const clamp=(n,min,max)=>Math.max(min,Math.min(n,max));
 
   function init(root){
-    if(root.__inited) return; root.__inited=true; log('init');
+    if(root.__inited) return; root.__inited=true;
 
     const autoplay=parseInt(root.dataset.autoplay||'0',10);
     const loop=root.dataset.loop==='true';
-    const ratio=root.dataset.ratio||''; if(ratio){ root.style.setProperty('--card-ratio',ratio); }
+    const ratio=root.dataset.ratio||''; if(ratio) root.style.setProperty('--card-ratio',ratio);
 
-    const items=$$('.unipop-item',root); if(!items.length){ log('no items'); return; }
+    const items=$$('.unipop-item',root); if(!items.length) return;
 
-    // Stage wrapper
+    // Stage
     const stage=document.createElement('div'); stage.className='unipop-stage';
     while(root.firstChild) stage.appendChild(root.firstChild); root.appendChild(stage);
 
     // Controls
     const nav=document.createElement('div'); nav.className='unipop-nav';
-    const prevBtn=document.createElement('button'); prevBtn.className='unipop-btn'; prevBtn.innerHTML='‹';
-    const nextBtn=document.createElement('button'); nextBtn.className='unipop-btn'; nextBtn.innerHTML='›';
+    const prevBtn=document.createElement('button'); prevBtn.className='unipop-btn'; prevBtn.innerHTML='‹'; prevBtn.ariaLabel='Zurück';
+    const nextBtn=document.createElement('button'); nextBtn.className='unipop-btn'; nextBtn.innerHTML='›'; nextBtn.ariaLabel='Weiter';
     nav.append(prevBtn,nextBtn); root.appendChild(nav);
 
+    // Dots
     const dots=document.createElement('div'); dots.className='unipop-dots';
-    items.forEach((_,i)=>{ const d=document.createElement('button'); d.className='unipop-dot'; d.type='button'; d.ariaLabel='Slide '+(i+1); dots.appendChild(d); });
+    items.forEach((_,i)=>{ const d=document.createElement('button'); d.className='unipop-dot'; d.type='button'; d.ariaLabel=`Slide ${i+1}`; dots.appendChild(d);});
     root.appendChild(dots);
 
-    let index=0, timer=null;
+    let index=0, timer=null, hoverTimer=null;
 
     function render(){
       const cs=getComputedStyle(root);
-      const gap=parseFloat(cs.getPropertyValue('--gap'))||26;
-      const ang=parseFloat(cs.getPropertyValue('--angle'))||18;
-      const step=parseFloat(cs.getPropertyValue('--scale-step'))||.12;
+      const gap=parseFloat(cs.getPropertyValue('--gap'))||24;
+      const ang=parseFloat(cs.getPropertyValue('--angle'))||16;
+      const step=parseFloat(cs.getPropertyValue('--scale-step'))||.11;
 
       items.forEach((el,i)=>{
         const off=i-index, dir=Math.sign(off), abs=Math.abs(off);
         const x=off*gap, sc=1-(abs*step), rot=dir*ang;
         el.style.zIndex=String(100-abs);
         el.style.transform=`translate(-50%,-50%) translateX(${x}%) rotateY(${rot}deg) scale(${sc})`;
-        el.setAttribute('aria-current', abs===0 ? 'true':'false');
+        el.setAttribute('aria-current', abs===0 ? 'true' : 'false');
       });
       $$('.unipop-dot',root).forEach((d,i)=> d.setAttribute('aria-current', String(i===index)));
     }
-
     function go(i){ index = loop ? (i+items.length)%items.length : clamp(i,0,items.length-1); render(); }
-    function next(){ go(index+1); } function prev(){ go(index-1); }
+    const next=()=>go(index+1);
+    const prev=()=>go(index-1);
 
-    nextBtn.addEventListener('click', ()=>{ next(); restart(); });
-    prevBtn.addEventListener('click', ()=>{ prev(); restart(); });
-    $$('.unipop-dot',root).forEach((d,i)=> d.addEventListener('click', ()=>{ go(i); restart(); }));
+    // Autoplay normal (Netflix-Tempo)
+    function start(){ if(autoplay>0){ stop(); timer=setInterval(next, autoplay); } }
+    function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+
+    // Hover: schneller blättern, bis Maus weg
+    function startHover(){ if(hoverTimer) return; hoverTimer=setInterval(next, 900); }
+    function stopHover(){ if(hoverTimer){ clearInterval(hoverTimer); hoverTimer=null; } }
+
+    // Events
+    nextBtn.addEventListener('click', ()=>{ next(); start(); });
+    prevBtn.addEventListener('click', ()=>{ prev(); start(); });
+    $$('.unipop-dot',root).forEach((d,i)=> d.addEventListener('click', ()=>{ go(i); start(); }));
+
+    // Keyboard
+    root.tabIndex = 0;
+    root.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'){ next(); start(); } if(e.key==='ArrowLeft'){ prev(); start(); } });
 
     // Swipe
     let sx=0, dragging=false;
-    stage.addEventListener('pointerdown', e=>{ dragging=true; sx=e.clientX; stage.setPointerCapture(e.pointerId); stop(); });
-    stage.addEventListener('pointerup', e=>{ if(!dragging) return; const dx=e.clientX - sx; dragging=false; if(dx<-40) next(); else if(dx>40) prev(); restart(); });
+    stage.addEventListener('pointerdown', e=>{ dragging=true; sx=e.clientX; stage.setPointerCapture(e.pointerId); stop(); stopHover(); });
+    stage.addEventListener('pointerup', e=>{ if(!dragging) return; const dx=e.clientX - sx; dragging=false; if(dx<-40) next(); else if(dx>40) prev(); start(); });
     stage.addEventListener('pointercancel', ()=> dragging=false);
 
-    function start(){ if(autoplay>0){ stop(); timer=setInterval(next,autoplay); log('autoplay start',autoplay); } }
-    function stop(){ if(timer){ clearInterval(timer); timer=null; log('autoplay stop'); } }
-    function restart(){ stop(); start(); }
+    // Hover start/stop
+    root.addEventListener('mouseenter', ()=>{ stop(); startHover(); });
+    root.addEventListener('mouseleave', ()=>{ stopHover(); start(); });
+
+    // Wheel optional (kommentierbar)
+    root.addEventListener('wheel', (e)=>{ e.deltaY>0 ? next() : prev(); start(); });
 
     go(0); start(); window.addEventListener('resize',render);
   }
 
-  document.addEventListener('DOMContentLoaded', ()=> {
-    $$('.unipop-coverflow').forEach(init);
-    // Sichtbarer Beweis, dass JS läuft:
-    const b=document.querySelector('.hdr'); if(b) b.insertAdjacentHTML('beforeend',' <small>· JS OK</small>');
-  });
+  document.addEventListener('DOMContentLoaded', ()=> $$('.unipop-coverflow').forEach(init));
   })();
   </script>
 </body>
